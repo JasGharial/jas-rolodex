@@ -1,21 +1,30 @@
 import './App.css';
 // import { Component } from 'react';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, ChangeEvent } from 'react';
 import CardList from './components/card-list/card-list.component';
 import SearchBox from './components/search-box/search-box.component';
+import { getData } from './utilities/data.utils';
+
+export type User = {
+  id: string;
+  name: string;
+  email: string;
+}
 
 export default function App() {
-  const [monsters, setMonsters] = useState([]);
+  const [monsters, setMonsters] = useState<User[]>([]);
   const [searchString, setSearchString] = useState('');
   const [filteredMonsters, setFilteredMonsters] = useState(monsters)
 
   useEffect(() => {
-    fetch('https://jsonplaceholder.typicode.com/users')
-      .then((response) => response.json())
-      .then((users) => setMonsters(users))
+    const fetchUsers = async () => {
+      const users = await getData<Array<User>>('https://jsonplaceholder.typicode.com/users')
+      setMonsters(users)
+    }
+    fetchUsers()
   }, [])
 
-  const onSearchChange = (event) => {
+  const onSearchChange = (event: ChangeEvent<HTMLInputElement>): void => {
     const searchFieldString = event.target.value.toLocaleLowerCase();
     setSearchString(searchFieldString)
   }
